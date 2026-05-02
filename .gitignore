@@ -8,3 +8,10 @@ wheels/
 
 # Virtual environments
 .venv
+
+
+# Carpeta de modelos
+models/*
+
+# Carpeta de datos
+data/*
