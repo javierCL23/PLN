@@ -12,6 +12,9 @@ wheels/
 
 # Carpeta de modelos
 models/*
+!models/.gitkeep
+
 
 # Carpeta de datos
 data/*
+!data/.gitkeep
