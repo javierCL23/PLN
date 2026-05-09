@@ -34,18 +34,17 @@ def get_word2vec_model():
     # Construimos la ruta usando tu objeto Path de config.py
     ruta_modelo_gz = PATH_MODELS / model_name / f"{model_name}.gz"
 
-    if ruta_modelo_gz.exists():
-        print(f"Modelo {model_name} ya detectado en local. Cargando...")
-        # Convertimos el Path a string para Gensim
-        _W2V_MODEL = KeyedVectors.load_word2vec_format(str(ruta_modelo_gz), binary=True)
-    else:
+    if not ruta_modelo_gz.exists():
         print(f"Modelo no encontrado. Descargando {model_name}...")
         # Configuramos las variables de entorno para que Gensim use la carpeta de PATH_MODELS
         os.environ["GENSIM_DATA_DIR"] = str(PATH_MODELS)
         api.BASE_DIR = str(PATH_MODELS)
-        
-        _W2V_MODEL = api.load(model_name)
         print(f"{model_name} descargado y cargado.")
+
+    else:
+        print(f"Modelo {model_name} ya detectado en local. Cargando...")
+
+    _W2V_MODEL = KeyedVectors.load_word2vec_format(str(ruta_modelo_gz), binary=True)
 
     return _W2V_MODEL
 
@@ -54,29 +53,48 @@ def get_word2vec_model():
 # Vectorización Dispersa vs Densa
 
 # Dispersas
+def BoW(textos: pd.Series, max_features=5000,vectorizador=None):
+    """
+    Convierte textos en Bag Of Words.
+    Si no se pasa vectorizador, asume que es Train: lo crea, lo entrena y lo devuelve.
+    Si se pasa vectorizador, asume que es Test: solo transforma usando el vocabulario aprendido.
+    """
+    if vectorizador is None:
+        # Train
+        vectorizador = CountVectorizer(max_features=max_features, min_df=2, stop_words='english')
+        X = vectorizador.fit_transform(textos)
+        df_resultado = pd.DataFrame(X.toarray(), columns=vectorizador.get_feature_names_out(), index=textos.index)
+        
+        return df_resultado, vectorizador
+        
+    else:
+        # Test
+        X = vectorizador.transform(textos)
+        df_resultado = pd.DataFrame(X.toarray(), columns=vectorizador.get_feature_names_out(), index=textos.index)
+        
+        # Solo devolvemos el DataFrame
+        return df_resultado, None
 
-def BoW(textos: pd.Series) -> pd.DataFrame:
+def TF_IDF(textos: pd.Series, max_features=5000, vectorizador=None):
     """
-    Convierte todos los textos en un Bag Of Words
-    limitado a las palabras más frecuentes de los textos.
+    Convierte textos en matriz TF-IDF.
+    Si no se pasa vectorizador, asume que es Train: lo crea, lo entrena y lo devuelve.
+    Si se pasa vectorizador, asume que es Test: solo transforma usando el vocabulario aprendido.
     """
-    # max_features limita a las N palabras más frecuentes
-    vectorizador = CountVectorizer(max_features=5000, min_df=2, stop_words='english')
-    
-    X = vectorizador.fit_transform(textos)
-    
-    return pd.DataFrame(X.toarray(), columns=vectorizador.get_feature_names_out())
-
-def TF_IDF(textos: pd.Series) -> pd.DataFrame:
-    """
-    Convierte todos los textos en una matriz con TF-IDF.
-    """
-    vectorizador = TfidfVectorizer(max_features=5000, min_df=2, stop_words='english')
-    
-    X = vectorizador.fit_transform(textos)
-    
-    return pd.DataFrame(X.toarray(), columns=vectorizador.get_feature_names_out())
-
+    if vectorizador is None:
+        # Train
+        vectorizador = TfidfVectorizer(max_features=max_features, min_df=2, stop_words='english')
+        X = vectorizador.fit_transform(textos)
+        df_resultado = pd.DataFrame(X.toarray(), columns=vectorizador.get_feature_names_out(), index=textos.index)
+        
+        return df_resultado, vectorizador
+        
+    else:
+        # Test
+        X = vectorizador.transform(textos)
+        df_resultado = pd.DataFrame(X.toarray(), columns=vectorizador.get_feature_names_out(), index=textos.index)
+        
+        return df_resultado, None
 
 # Densas
 
