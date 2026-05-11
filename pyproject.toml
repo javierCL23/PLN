@@ -14,9 +14,10 @@ dependencies = [
     "en-core-web-sm",
     "scikit-learn>=1.8.0",
     "gensim>=4.4.0",
-    "transformers>=5.7.0",
+    "transformers[torch]>=5.7.0",
     "torch>=2.11.0",
     "pyarrow>=24.0.0",
+    "datasets>=4.8.5",
 ]
 
 [tool.uv.sources]
