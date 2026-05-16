@@ -22,7 +22,6 @@ En esta sección se explora la evolución de los sistemas de clasificación de t
 **Estructura principal**:
 ```
 ├── main.ipynb
-├── Dockerfile
 ├── data/
 ├── models/
 ├── scripts/
@@ -38,7 +37,7 @@ En esta sección se explora la evolución de los sistemas de clasificación de t
 El código de este ejercicio está pensado para tener dos funciones:
 
 1. Función del ejercicio normal, es decir, todo lo explicado anteriormente. Para visualizar todo lo hecho se puede revisar el main.ipynb y desde ahí, las funciones desarrolladas en el src. (a excepción del server.py)
-2. Función de servidor MCP para el uso de herramientas descentralizadas del agente del ejercicio 2. Para este segundo caso de uso es necesario revisar únicamente el server.py y la imagen de Docker.
+2. Función de servidor MCP para el uso de herramientas descentralizadas del agente del ejercicio 2. Para este segundo caso de uso es necesario revisar únicamente el server.py y la imagen de Docker de la raiz del repo.
 ---
 
 **Autor:** Javier Carreño Luque
