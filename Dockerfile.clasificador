@@ -1,0 +1,39 @@
+# Build
+FROM ghcr.io/astral-sh/uv:python3.12-bookworm-slim AS builder
+
+ENV PYTHONDONTWRITEBYTECODE=1
+ENV PYTHONUNBUFFERED=1
+ENV UV_LINK_MODE=copy
+
+WORKDIR /app
+
+# Copiar dependencias
+COPY pyproject.toml uv.lock ./
+COPY clasificador/pyproject.toml ./clasificador/
+# Instalar las dependencias solo del clasificador
+RUN --mount=type=cache,target=/root/.cache/uv \
+    uv sync --frozen --no-install-project --no-dev --package clasificador
+
+# Runtime
+FROM python:3.12-slim-bookworm
+
+ENV PYTHONDONTWRITEBYTECODE=1
+ENV PYTHONUNBUFFERED=1
+# Invocar el entorno generado durante el builder
+ENV PATH="/app/.venv/bin:$PATH"
+ENV PYTHONPATH="/app/clasificador"
+
+WORKDIR /app
+
+# Entorno virtual ya construido del builder
+COPY --from=builder /app/.venv /app/.venv
+
+# Copiar source code (temporal, ver si podemos eliminar algo de models que no se use)
+COPY clasificador/src/ ./clasificador/src/
+COPY clasificador/models/ ./clasificador/models/
+
+# Puerto del MCP Server
+EXPOSE 5000
+
+# Ejecución del servidor
+CMD ["python", "clasificador/src/server.py"]

@@ -1,0 +1,24 @@
+[project]
+name = "clasificador"
+version = "0.1.0"
+description = "Servidor MCP para invocar las Tools de clasificación para el ejercicio 2 (agente)"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "langchain>=1.2.15",
+    "langchain-ollama>=1.1.0",
+    "langgraph>=1.1.10",
+    "pandas>=3.0.2",
+    "spacy>=3.8.14",
+    "en-core-web-sm",
+    "scikit-learn>=1.8.0",
+    "gensim>=4.4.0",
+    "transformers[torch]>=5.7.0",
+    "torch>=2.11.0",
+    "pyarrow>=24.0.0",
+    "datasets>=4.8.5",
+    "mcp>=1.27.1",
+]
+
+[tool.uv.sources]
+en-core-web-sm = { url = "https://github.com/explosion/spacy-models/releases/download/en_core_web_sm-3.8.0/en_core_web_sm-3.8.0-py3-none-any.whl" }
