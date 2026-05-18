@@ -21,23 +21,33 @@ En esta sección se explora la evolución de los sistemas de clasificación de t
 
 **Estructura principal**:
 ```
-├── main.ipynb
-├── data/
-├── models/
+./
+├── main.ipynb              # Jupyter Notebook con todo runeado
+├── models/                 # Carpeta con los modelos usados para los BERT y Word2Vec
 ├── scripts/
-|   └── fineTunning.py
+|   └── fineTunning.py      # Script para el Fine-Tuning del modelo BERT
 ├── src/
-|   ├── config.py
-|   ├── preprocesado.py
-|   ├── vectorizacion.py
-|   └── server.py
+|   ├── config.py           # Configuración de Paths (no hace falta modificarlo, se pueden usar ENV)
+|   ├── preprocesado.py     # Funciones de preprocesado
+|   └── vectorizacion.py    # Funciones de vectorizaciones densas y esparsas
 └── pyproject.toml
+
+../
+└── data/                   # Carpeta donde se leen los datos por defecto (En la carpeta padre; raiz del repo)
 ```
 
-El código de este ejercicio está pensado para tener dos funciones:
+## Ejecución
 
-1. Función del ejercicio normal, es decir, todo lo explicado anteriormente. Para visualizar todo lo hecho se puede revisar el main.ipynb y desde ahí, las funciones desarrolladas en el src. (a excepción del server.py)
-2. Función de servidor MCP para el uso de herramientas descentralizadas del agente del ejercicio 2. Para este segundo caso de uso es necesario revisar únicamente el server.py y la imagen de Docker de la raiz del repo.
+En caso de querer ejecutarse el código será necesario tener construido el venv del repositorio con al menos los paquetes del workspace 'clasificacion'.
+
+Para ejecutar el notebook, solo es necesario acceder a este desde un IDE de preferencia con extensiones de Jupyter seleccionando el kernel del entorno virtual.
+
+Si se quiere ejecutar el script de fine-tuning:
+
+``` bash
+uv run python -m scripts.FineTuning
+```
+
 ---
 
 **Autor:** Javier Carreño Luque

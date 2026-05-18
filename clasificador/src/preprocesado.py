@@ -139,6 +139,8 @@ def cargar_datos(test: bool = False, guardar: bool = True) -> pd.DataFrame:
                 local_dir_use_symlinks=False
             )
         df = pd.read_json(str(path_raw), lines=True)
+        df = df.dropna(subset=["description", "title"])
+        df = df.drop_duplicates(subset=["title"])
         df = preprocesar_datos(df,conjunto, guardar)
     else:
         print("Cargando datos preprocesados...")
