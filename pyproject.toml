@@ -6,11 +6,16 @@ readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [
     "jupyter>=1.1.1",
-    "clasificador"
+    "clasificador",
+    "agente"
 ]
 
 [tool.uv.workspace]
-members = ["clasificador"]
+members = [
+    "clasificador",
+    "agente",
+]
 
 [tool.uv.sources]
 clasificador = { workspace = true }
+agente = {workspace = true }
