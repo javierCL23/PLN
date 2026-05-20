@@ -38,10 +38,38 @@ Para gestionar este flujo de ejecución, la interacción con el sistema RAG no e
 * Tool de Recuperación (RAG): Permite al LLM consultar la base de datos vectorial.
 * Tool de Clasificación Clásica: Ofrece la posibilidad (ya sea por decisión del sistema o elección del usuario) de delegar la predicción. De este modo, se puede confiar en el criterio analítico del LLM, o invocar el modelo estadístico clásico entrenado previamente para determinar la categoría final.
 
+Esta implementación está basada en este ejemplo de [patrón de orquestación](https://youtu.be/aHCDrAbH_go?si=JG6OjMfZtm-obUcg&t=840).
+
 ## Estructura del código
 
 **Estructura principal**:
+```
+.
+├── agente.py               # Punto de entrada principal para ejecutar el agente conversacional (API).
+├── index.html              # Interfaz web básica de usuario para interactuar con el agente.
+├── docker-compose.yml      # Configuración de servicios Docker (levantar la app y servicio de Ollama).
+├── Dockerfile              # Imagen con la aplicación para su uso con docker-compose.
+├── pyproject.toml
+├── RAGSystem.ipynb         # Notebook con la parte 1 del ejercicio.
+├── README.md
+├── scripts
+│   └── build_vs.py         # Script de ingesta: lee los datos, genera embeddings y construye la base de datos vectorial.
+├── src                     # Código fuente principal de la aplicación.
+│   ├── __init__.py
+│   ├── classifiers.py      # Contiene la lógica de los modelos para predecir las categorías.
+│   ├── config.py           # Variables de entorno, rutas a directorios y configuraciones globales.
+│   ├── graph.py            # Definición de los nodos con el flujo de LangGraph (orquestador, workers, sintetizador y enrutamiento).
+│   ├── llm.py              # Inicialización del LLM, parámetros del modelo y configuración de salidas estructuradas.
+│   ├── prompts.py          # Centralización de los SystemMessages y directrices para el agente.
+│   ├── rag.py              # Lógica interna de creación/conexión con el VectorStore y Retriever.
+│   ├── state.py            # Definición de los esquemas de datos (State, WorkerState, Task, Tasks).
+│   ├── tools.py            # Definición de las @tools (buscar_noticias, clasificar_noticia) que los workers invocan.
+│   └── utils.py            # Funciones auxiliares genéricas (limpieza de texto, carga de datos...).
+└── vector_db/              # Directorio local donde se persisten los índices de la base de datos vectorial (Chroma).
 
+../
+└── data/                   # Carpeta (en la raíz del repositorio) que almacena los datasets originales de noticias.
+```
 
 ## Ejecución
 
@@ -51,10 +79,26 @@ Por un lado, la implementación del RAG con todas las comparativas realizadas se
 
 Está planteado de esta manera para poder visualizar de manera rápida todas las comparativas con los resultados comentados sin tener que cambiar entre memoria y código constantemente o ejecutar procesos tan demandantes como los relacionados con el uso de Transformers.
 
-Y por otro lado, el agente está pensado para ser usado en un entorno aislado con Docker-compose. Por un lado se tiene la imagen con el código del agente, y por otro lado las imágenes tanto del servidor al que se hacen las solicitudes a las Tools por medio de MCP (Model Context Protocol) y la imágen con el ollama, que es el punto de entrada al modelo LLM.
+Y por otro lado, el agente está pensado para ser usado en un entorno aislado con Docker-compose. Por un lado se tiene la imagen con el código del agente, y por otro lado la imágen con ollama, que es el punto de entrada al modelo LLM.
 
-Este segundo está planteado de esta manera para imitar al máximo una puesta en marcha real donde se tenga el sistema lo mejor distribuido posible para así evitar sobrecargar un mismo ordenador/servidor/Instancia.
+Este segundo está planteado de esta manera para imitar una puesta en marcha real donde se tenga el sistema mínimamente distribuido.
 
+Para ejecutarlo, se debe ejecutar únicamente:
+``` bash
+# En caso de usar docker
+docker-compose up
+
+# En caso de usar podman
+podman-compose up
+```
+Y desde un navegador web entrar a este [enlace](http://127.0.0.1:9090/)
+
+> **Warning**
+> Para que funcione todo correctamente, debe existir un `vector_db` dentro de esta misma carpeta.
+> Para ello, se puede ejecutar el script build_vs.py
+``` bash
+uv run python -m scripts.build_vs
+```
 ---
 
 **Autor:** Javier Carreño Luque

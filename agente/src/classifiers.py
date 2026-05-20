@@ -94,7 +94,7 @@ def predecir_categoria_knn(titulo: str, retriever) -> str:
     
     conteo = Counter(categorias)
     
-    #conteo.most_common(1) = [(categoria_ganadora, votos)]
+    # conteo.most_common(1) = [(categoria_ganadora, votos)]
     # En caso de empate, se coge el primero que aparezca en la lista (el primero que entró, que tiene prioridad en el retrieval)
     categoria_ganadora = conteo.most_common(1)[0][0]
     

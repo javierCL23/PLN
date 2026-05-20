@@ -1,0 +1,50 @@
+services:
+  # LLM Ollama
+  ollama:
+    image: ollama/ollama:latest
+    container_name: ollama
+    ports:
+      - "11434:11434"
+    volumes:
+      - ollama_data:/root/.ollama
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]
+
+  # Contenedor para descargar granite4
+  ollama-init:
+    image: ollama/ollama:latest
+    container_name: ollama_init
+    depends_on:
+      - ollama
+    environment:
+      - OLLAMA_HOST=ollama:11434
+    command: pull granite4:micro
+
+  # Agente
+  agente:
+    build: .
+    container_name: agente_ai
+    ports:
+      - "9090:9090"
+    volumes:
+      # Montar vector_db para evitar copiar cada vez
+      - ./vector_db:/app/vector_db
+    environment:
+      - PATH_VECTOR_DB=/app/vector_db
+
+      - LLM_PROVIDER=ollama
+      - LLM_URL=http://ollama:11434
+      - LLM_MODEL=granite4:micro
+      - ORCHESTRATOR_MODEL=granite4:micro
+      - WORKER_MODEL=granite4:micro
+    depends_on:
+      - ollama
+
+# Declaramos el volumen persistente para que Ollama no descargue el modelo cada vez
+volumes:
+  ollama_data:

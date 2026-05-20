@@ -1,13 +1,27 @@
-from pathlib import Path
-
-import pandas as pd
 from langchain_core.documents import Document
 from langchain_huggingface import HuggingFaceEmbeddings
 from langchain_chroma import Chroma
 
+import pandas as pd
+
 from src.config import PATH_VECTOR_DB, EMBEDDING_MODEL, LABEL_TO_CLASS
 
 
+def obtener_vs(path: str | None = None) -> Chroma:
+    """
+    Devuelve un objeto Chroma. 
+    Lo puede crear desde 0 o tomando un Path
+    """
+    if path is None:
+        raise ValueError("Debes proporcionar un objeto 'vector_store' o un 'path' válido para la VS.")
+    
+    embeddings = HuggingFaceEmbeddings(model_name=EMBEDDING_MODEL)
+    
+    vector_store = Chroma(
+        persist_directory=path,
+        embedding_function=embeddings
+    )
+    return vector_store
 
 def obtener_retriever(k: int = 3, vector_store: Chroma | None = None, path: str | None = None):
     """
@@ -16,17 +30,9 @@ def obtener_retriever(k: int = 3, vector_store: Chroma | None = None, path: str 
     Si no se pasa, es obligatorio proporcionar un 'path' para cargarlo desde el disco.
     """
 
-    # Cargar VS si no se pasa como argumentos
+    # Cargar VS desde el path si no se pasa como argumentos
     if vector_store is None:
-        if path is None:
-            raise ValueError("Debes proporcionar un objeto 'vector_store' o un 'path' válido para la VS.")
-        
-        embeddings = HuggingFaceEmbeddings(model_name=EMBEDDING_MODEL)
-        
-        vector_store = Chroma(
-            persist_directory=path,
-            embedding_function=embeddings
-        )
+        vector_store = obtener_vs(path)
     
     # Cargar retriever
     retriever = vector_store.as_retriever(

@@ -27,6 +27,9 @@ CLASS_TO_LABEL = {v: k for k, v in LABEL_TO_CLASS.items()}
 
 # Variables de modelos
 LLM_MODEL = os.getenv("LLM_MODEL","granite4:micro")
-ORCHESTRATOR_MODEL = os.getenv("ORCHESTRATOR_MODEL","mixtral:8x7b")
-WORKER_MODEL = os.getenv("WORKER_MODEL","granite4:micro")
 EMBEDDING_MODEL = "sentence-transformers/msmarco-distilbert-base-v4"
+
+LLM_PROVIDER = os.getenv("LLM_PROVIDER","ollama")
+LLM_URL = os.getenv("LLM_URL",None)
+ORCHESTRATOR_MODEL = os.getenv("ORCHESTRATOR_MODEL","granite4:micro")
+WORKER_MODEL = os.getenv("WORKER_MODEL","granite4:micro")

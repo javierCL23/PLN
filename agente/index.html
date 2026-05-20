@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Agente Interactivo</title>
+    <style>
+        body { font-family: system-ui, sans-serif; background: #f4f4f9; display: flex; justify-content: center; padding: 2rem; margin: 0; }
+        .chat-container { width: 100%; max-width: 600px; background: white; border-radius: 10px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); display: flex; flex-direction: column; height: 85vh; overflow: hidden; }
+        
+        /* Nueva barra de configuración superior */
+        .settings-bar { background: #343a40; color: white; padding: 10px 15px; display: flex; align-items: center; gap: 10px; font-size: 0.9em; }
+        .settings-bar label { font-weight: bold; }
+        .settings-bar input { flex: 1; padding: 5px 8px; border-radius: 4px; border: 1px solid #6c757d; background: #495057; color: white; outline: none; font-family: monospace;}
+        .settings-bar input:focus { border-color: #007bff; }
+
+        .chat-box { flex: 1; padding: 1.5rem; overflow-y: auto; display: flex; flex-direction: column; gap: 1rem; }
+        .mensaje { padding: 10px 15px; border-radius: 8px; max-width: 85%; white-space: pre-wrap; word-wrap: break-word; }
+        .usuario { background: #007bff; color: white; align-self: flex-end; }
+        .agente { background: #e9ecef; color: #333; align-self: flex-start; }
+        .progreso { font-size: 0.85em; color: #666; font-style: italic; align-self: flex-start; margin-bottom: -10px;}
+        
+        .input-area { display: flex; padding: 1rem; border-top: 1px solid #ddd; align-items: flex-end; background: white; }
+        textarea { flex: 1; padding: 10px; border: 1px solid #ccc; border-radius: 5px; outline: none; resize: none; font-family: inherit; line-height: 1.4; min-height: 20px; max-height: 150px; overflow-y: auto; }
+        textarea:focus { border-color: #007bff; }
+        button { padding: 10px 20px; margin-left: 10px; height: 42px; background: #007bff; color: white; border: none; border-radius: 5px; cursor: pointer; transition: background 0.2s; }
+        button:hover { background: #0056b3; }
+        button:disabled { background: #aaa; cursor: not-allowed; }
+    </style>
+</head>
+<body>
+
+<div class="chat-container">
+    <!-- Barra de ajustes del endpoint -->
+    <div class="settings-bar">
+        <label for="apiUrl">🔌 Endpoint API:</label>
+        <input type="text" id="apiUrl" value="http://localhost:8000" title="URL del servidor FastAPI">
+    </div>
+
+    <div class="chat-box" id="chatBox">
+        <div class="mensaje agente">Hola, soy tu agente. Escribe tu petición para comenzar.</div>
+    </div>
+    
+    <div class="input-area">
+        <textarea id="userInput" rows="1" placeholder="Escribe tu mensaje... (Shift + Enter para salto de línea)"></textarea>
+        <button id="sendBtn" onclick="enviarMensaje()">Enviar</button>
+    </div>
+</div>
+
+<script>
+    document.getElementById("apiUrl").value = window.location.origin;
+
+    const inputField = document.getElementById("userInput");
+
+    // Ajustar altura del textarea dinámicamente según se escribe
+    inputField.addEventListener("input", function() {
+        this.style.height = "auto";
+        this.style.height = (this.scrollHeight) + "px";
+    });
+
+    // Detectar Enter (enviar) vs Shift+Enter (nueva línea)
+    inputField.addEventListener("keydown", function(event) {
+        if (event.key === "Enter" && !event.shiftKey) {
+            event.preventDefault();
+            enviarMensaje();
+        }
+    });
+
+    async function enviarMensaje() {
+        const input = document.getElementById("userInput");
+        const chatBox = document.getElementById("chatBox");
+        const btn = document.getElementById("sendBtn");
+        let baseUrl = document.getElementById("apiUrl").value.trim();
+        if (baseUrl.endsWith("/")) baseUrl = baseUrl.slice(0, -1);
+        const apiUrl = baseUrl + "/chat";
+        const texto = input.value.trim();
+        
+        if (!texto) return;
+
+        // Validación básica de la URL
+        if (!apiUrl.startsWith("http")) {
+            alert("Por favor, introduce una URL válida que empiece por http:// o https://");
+            return;
+        }
+
+        // Mostrar mensaje del usuario
+        chatBox.innerHTML += `<div class="mensaje usuario">${texto}</div>`;
+        input.value = "";
+        input.style.height = "auto"; 
+        btn.disabled = true;
+        
+        // Crear indicador de progreso
+        const divProgreso = document.createElement("div");
+        divProgreso.className = "progreso";
+        chatBox.appendChild(divProgreso);
+        chatBox.scrollTop = chatBox.scrollHeight;
+
+        try {
+            // Usamos la URL dinámica en el fetch
+            const response = await fetch(apiUrl, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ mensaje: texto })
+            });
+
+            if (!response.ok) {
+                throw new Error(`Error del servidor: ${response.status}`);
+            }
+
+            const reader = response.body.getReader();
+            const decoder = new TextDecoder("utf-8");
+
+            while (true) {
+                const { done, value } = await reader.read();
+                if (done) break;
+                
+                const chunks = decoder.decode(value).split("\n");
+                
+                for (let chunk of chunks) {
+                    if (!chunk.trim()) continue;
+                    
+                    try {
+                        const data = JSON.parse(chunk);
+                        
+                        if (data.tipo === "progreso") {
+                            divProgreso.innerHTML += `${data.contenido}<br>`;
+                            chatBox.scrollTop = chatBox.scrollHeight;
+                        } 
+                        else if (data.tipo === "resultado" || data.tipo === "error") {
+                            divProgreso.remove();
+                            chatBox.innerHTML += `<div class="mensaje agente"><strong> Respuesta:</strong><br><br>${data.contenido}</div>`;
+                        }
+                    } catch (e) {
+                        console.warn("Fragmento ignorado o mal formado:", chunk);
+                    }
+                }
+            }
+        } catch (error) {
+            divProgreso.remove();
+            chatBox.innerHTML += `<div class="mensaje agente" style="color:#d9534f"> ERROR: No se pudo conectar al servidor en <b>${apiUrl}</b>.<br><br>Asegúrate de que Uvicorn está corriendo y el puerto es correcto.</div>`;
+            console.error("Error de conexión:", error);
+        }
+
+        btn.disabled = false;
+        chatBox.scrollTop = chatBox.scrollHeight;
+        inputField.focus();
+    }
+</script>
+
+</body>
+</html>
