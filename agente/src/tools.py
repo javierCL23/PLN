@@ -1,8 +1,8 @@
 from langchain_core.tools import tool
 
-from src.rag import obtener_retriever, obtener_vs
-from src.config import PATH_VECTOR_DB
-from src.classifiers import predecir_categoria_knn
+from .rag import obtener_retriever, obtener_vs
+from .config import PATH_VECTOR_DB
+from .classifiers import predecir_categoria_knn
 
 VECTOR_STORE_GLOBAL = obtener_vs(PATH_VECTOR_DB)
 

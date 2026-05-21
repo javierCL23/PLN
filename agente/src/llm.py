@@ -1,9 +1,9 @@
 from langchain_ollama import ChatOllama
 from langchain_openai import ChatOpenAI
 
-from src.state import Tasks
-from src.config import ORCHESTRATOR_MODEL, WORKER_MODEL, LLM_PROVIDER, LLM_URL
-from src.tools import buscar_noticias, clasificar_noticia
+from .state import Tasks
+from .config import ORCHESTRATOR_MODEL, WORKER_MODEL, LLM_PROVIDER, LLM_URL
+from .tools import buscar_noticias, clasificar_noticia
 
 if LLM_PROVIDER.lower() == "openai":
     base_orchestrator = ChatOpenAI(model=ORCHESTRATOR_MODEL, temperature=0.3)

@@ -91,6 +91,12 @@ docker-compose up
 # En caso de usar podman
 podman-compose up
 ```
+Si se quiere crear la imagen de manera independiente al docker-compose:
+
+``` bash
+podman build -t NOMBRE_IMAGEN .
+```
+
 Y desde un navegador web entrar a este [enlace](http://127.0.0.1:9090/)
 
 > **Warning**
@@ -98,6 +104,20 @@ Y desde un navegador web entrar a este [enlace](http://127.0.0.1:9090/)
 > Para ello, se puede ejecutar el script build_vs.py
 ``` bash
 uv run python -m scripts.build_vs
+```
+
+Otra forma de usar el agente pero con modelos de OpenAI sería ejecutando el contenedor con las flags adecuadas:
+``` bash
+docker run -d \
+  --name agente_ai \
+  -e LLM_PROVIDER="openai" \
+  -e OPENAI_API_KEY="API_KEY_HERE" \
+  -e ORCHESTRATOR_MODEL="gpt-4o" \
+  -e WORKER_MODEL="gpt-4o-mini" \
+  NOMBRE_IMAGEN
+
+# También se puede invocar con un archivo .env en el que se definan estas
+docker run -d --name agente_ai --env-file .env NOMBRE_IMAGEN
 ```
 ---
 

@@ -3,8 +3,8 @@ from collections import Counter
 from langchain_ollama import ChatOllama
 from langchain_core.prompts import ChatPromptTemplate
 
-from src.utils import fallback_postprocessing
-from src.config import CLASS_NAMES
+from .utils import fallback_postprocessing
+from .config import CLASS_NAMES
 
 def predecir_categoria(titulo: str, fallback: bool = True) -> str:
     """

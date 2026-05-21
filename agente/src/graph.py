@@ -1,11 +1,11 @@
 from langchain.messages import SystemMessage, HumanMessage
 from langgraph.types import Send
 
-from src.state import State,WorkerState
-from src.llm import llm_tasker, llm_recommendator, llm_clasificator, llm_synthesizer
+from .state import State,WorkerState
+from .llm import llm_tasker, llm_recommendator, llm_clasificator, llm_synthesizer
 
-from src.tools import buscar_noticias, clasificar_noticia
-from src.prompts import ORCHESTRATOR_PROMPT, RECOMENDATOR_PROMPT, CLASIFICATOR_PROMPT, SYNTHESIZER_PROMPT
+from .tools import buscar_noticias, clasificar_noticia
+from .prompts import ORCHESTRATOR_PROMPT, RECOMENDATOR_PROMPT, CLASIFICATOR_PROMPT, SYNTHESIZER_PROMPT
 
 
 # Nodo encargado de asignar tareas

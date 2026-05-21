@@ -4,7 +4,7 @@ from langchain_chroma import Chroma
 
 import pandas as pd
 
-from src.config import PATH_VECTOR_DB, EMBEDDING_MODEL, LABEL_TO_CLASS
+from .config import PATH_VECTOR_DB, EMBEDDING_MODEL, LABEL_TO_CLASS
 
 
 def obtener_vs(path: str | None = None) -> Chroma:

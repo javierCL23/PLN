@@ -3,7 +3,7 @@ from huggingface_hub import hf_hub_download
 import pandas as pd
 from pathlib import Path
 
-from src.config import PATH_DATA, CLASS_NAMES
+from .config import PATH_DATA, CLASS_NAMES
 
 def preprocesado_minimo(series_de_texto: pd.Series) -> pd.Series:
     """

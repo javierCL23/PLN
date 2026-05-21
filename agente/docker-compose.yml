@@ -1,5 +1,5 @@
 services:
-  # LLM Ollama
+  # LLM Ollama (Usa los modelos descargados del host para evitar pérder el tiempo en descargar modelos)
   ollama:
     image: ollama/ollama:latest
     container_name: ollama
@@ -15,7 +15,7 @@ services:
               count: 1
               capabilities: [gpu]
 
-  # Contenedor para descargar granite4
+  # Contenedor para descargar granite4 en caso de que no se tenga ya descargado.
   ollama-init:
     image: ollama/ollama:latest
     container_name: ollama_init
@@ -45,6 +45,6 @@ services:
     depends_on:
       - ollama
 
-# Declaramos el volumen persistente para que Ollama no descargue el modelo cada vez
+# Volumen persistente para que Ollama no descargue el modelo cada vez
 volumes:
   ollama_data:
