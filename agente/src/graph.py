@@ -17,7 +17,7 @@ def orquestador(state: State):
         SystemMessage(content=ORCHESTRATOR_PROMPT),
         HumanMessage(content=state["input"])
     ])
-
+    print(f"Orquestador mandando {len(tareas.tasks)} peticiones...")
     # Asigna al campo tareas del state el listado de tasks de la clase Tasks que devuelve el llm
     return {"tareas": tareas.tasks}
 
@@ -69,12 +69,13 @@ def llm_call(state: WorkerState):
         f"Descripción de la tarea: {tarea.description}\n"
         f"Resultado:\n{resultado_parcial.strip()}"
     )
-    
+    print(texto_completado)
     return {"tareas_completadas": [texto_completado]}
 
 # Nodo especial en caso de no haber tareas
 def manejo_sin_tareas(state: State):
     """Nodo de Fallback"""
+    print("Ninguna tarea detectada... Saliendo a fallback con mensaje de aviso.")
     mensaje = "No he detectado ninguna petición de clasificación o recomendación de noticias en tu mensaje."
     return {"output": mensaje}
 
