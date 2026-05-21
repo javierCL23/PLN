@@ -1,4 +1,6 @@
 import string
+import html
+from typing import Literal
 
 import pandas as pd
 import numpy as np
@@ -19,6 +21,10 @@ def limpieza_comun(series_de_texto: pd.Series) -> pd.Series:
     """
     Aplica limpieza común a toda una Serie de Pandas usando métodos vectorizados .str
     """
+
+    # Decodificar entidades HTML (&#39; a ', &amp; a &, etc.)
+    texto_limpio = series_de_texto.fillna("").apply(html.unescape)
+
     # El dataset contiene '\' que deben ser eliminadas manualmente
     texto_limpio = series_de_texto.str.replace(r'\\', ' ', regex=True)
     
@@ -56,7 +62,7 @@ def preprocessing_basico(series_de_texto: pd.Series) -> pd.Series:
 
 def preprocessing_avanzado(series_de_texto: pd.Series) -> list:
     """
-     Limpia el texto convirtiéndolo todo a minúsculas y eliminando signos de puntuación.
+    Limpia el texto convirtiéndolo todo a minúsculas y eliminando signos de puntuación.
     También elimina las palabras que sean stopWords.
     Útil para modelos estadísticos básados en frecuencias. 
     """
@@ -66,6 +72,7 @@ def preprocessing_avanzado(series_de_texto: pd.Series) -> list:
                         batch_size=1000, 
                         disable=["ner", "parser"]):
         
+        # Lematización, pasar a minúsculas, eliminar stopwords, puntuaciones.
         tokens = [word.lemma_.lower() for word in doc 
                   if not word.is_stop 
                   and not word.is_punct 
@@ -75,12 +82,12 @@ def preprocessing_avanzado(series_de_texto: pd.Series) -> list:
         
     return textos_limpios
 
-
-def preprocesar_datos(df: pd.DataFrame, conjunto: str = None, guardar: bool = False) -> pd.DataFrame:
+def preprocesar_datos(df: pd.DataFrame, conjunto:Literal["train","test"], guardar: bool = False) -> pd.DataFrame:
     """
     Añade columnas con los preprocesados de texto al conjunto df.
     'conjunto' puede tomar valores "train" o "test".
     Por defecto no guarda el dataframe resultante en almacenamiento persistente.
+    En caso contrario, lo guarda en PATH_DATA. 
     """
     print("Minimo iniziando...",end=" ")
     df['desc_minimal'] = preprocessing_minimal(df.description)
@@ -96,7 +103,7 @@ def preprocesar_datos(df: pd.DataFrame, conjunto: str = None, guardar: bool = Fa
     df = df.drop(["description"], axis=1)
 
     # Guardar datos
-    if conjunto not in ["test","train"] and guardar:
+    if guardar:
         save_path = PATH_DATA / f"{conjunto}_preprocesado.jsonl"
         df.to_json(
             save_path, 
@@ -116,10 +123,11 @@ def cargar_datos(test: bool = False, guardar: bool = True) -> pd.DataFrame:
     """
 
     # Define si se cargará train o test
-    if not test:
-        conjunto = "train"
-    else:
+    if test:
         conjunto = "test"
+    else:
+        conjunto = "train"
+
     path_raw = PATH_DATA / f"{conjunto}.jsonl"
     path_prep = PATH_DATA / f"{conjunto}_preprocesado.jsonl"
 

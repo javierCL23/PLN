@@ -10,7 +10,7 @@ from gensim.models import KeyedVectors
 from transformers import BertTokenizer, BertModel
 import torch
 
-from .config import PATH_MODELS
+from .config import PATH_MODELS, W2V_MODEL, BERT_MODEL
 
 
 
@@ -30,13 +30,14 @@ def get_word2vec_model():
     if _W2V_MODEL is not None:
         return _W2V_MODEL
 
-    model_name = "word2vec-google-news-300"
-    # Construimos la ruta usando tu objeto Path de config.py
+    model_name = W2V_MODEL
+
+    # Ruta al w2v_model
     ruta_modelo_gz = PATH_MODELS / model_name / f"{model_name}.gz"
 
     if not ruta_modelo_gz.exists():
         print(f"Modelo no encontrado. Descargando {model_name}...")
-        # Configuramos las variables de entorno para que Gensim use la carpeta de PATH_MODELS
+        # Variables de entorno para que Gensim use la carpeta de PATH_MODELS
         os.environ["GENSIM_DATA_DIR"] = str(PATH_MODELS)
         api.BASE_DIR = str(PATH_MODELS)
         print(f"{model_name} descargado y cargado.")
@@ -47,7 +48,6 @@ def get_word2vec_model():
     _W2V_MODEL = KeyedVectors.load_word2vec_format(str(ruta_modelo_gz), binary=True)
 
     return _W2V_MODEL
-
 
 
 # Vectorización Dispersa vs Densa
@@ -65,6 +65,7 @@ def BoW(textos: pd.Series, max_features=5000,vectorizador=None):
         X = vectorizador.fit_transform(textos)
         df_resultado = pd.DataFrame(X.toarray(), columns=vectorizador.get_feature_names_out(), index=textos.index)
         
+        # Dataframe + Vectorizer Entrenado
         return df_resultado, vectorizador
         
     else:
@@ -72,7 +73,7 @@ def BoW(textos: pd.Series, max_features=5000,vectorizador=None):
         X = vectorizador.transform(textos)
         df_resultado = pd.DataFrame(X.toarray(), columns=vectorizador.get_feature_names_out(), index=textos.index)
         
-        # Solo devolvemos el DataFrame
+        # Solo el DataFrame
         return df_resultado, None
 
 def TF_IDF(textos: pd.Series, max_features=5000, vectorizador=None):
@@ -87,17 +88,18 @@ def TF_IDF(textos: pd.Series, max_features=5000, vectorizador=None):
         X = vectorizador.fit_transform(textos)
         df_resultado = pd.DataFrame(X.toarray(), columns=vectorizador.get_feature_names_out(), index=textos.index)
         
+        # Dataframe + Vectorizer Entrenado
         return df_resultado, vectorizador
         
     else:
         # Test
         X = vectorizador.transform(textos)
         df_resultado = pd.DataFrame(X.toarray(), columns=vectorizador.get_feature_names_out(), index=textos.index)
-        
+
+        # Solo el DataFrame
         return df_resultado, None
 
 # Densas
-
 def Word2Vec_Embeddings(textos: pd.Series, modelo_w2v) -> pd.DataFrame:
     """
     Calcula el vector promedio de cada documento usando un modelo Word2Vec preentrenado.
@@ -122,9 +124,8 @@ def Word2Vec_Embeddings(textos: pd.Series, modelo_w2v) -> pd.DataFrame:
     # Aplicar a todas las descripciones
     vectores_documentos = [obtener_vector_documento(tokens) for tokens in descripciones_tokenizadas]
     
-    nombres_columnas = [f"w2v_google_{i}" for i in range(dimensiones)]
+    nombres_columnas = [f"w2v_{i}" for i in range(dimensiones)]
     return pd.DataFrame(vectores_documentos, index=textos.index, columns=nombres_columnas)
-
 
 def BERT_Embeddings(series_de_texto: pd.Series) -> pd.DataFrame:
     """
@@ -132,8 +133,8 @@ def BERT_Embeddings(series_de_texto: pd.Series) -> pd.DataFrame:
     Toma el token especial [CLS] como representación semántica del texto completo.
     """
     print("Cargando modelo BERT y tokenizador...")
-    # Cargamos la versión uncased (todo minúsculas por defecto en BERT)
-    nombre_modelo = 'bert-base-uncased'
+
+    nombre_modelo = BERT_MODEL
     tokenizer = BertTokenizer.from_pretrained(nombre_modelo, cache_dir=PATH_MODELS)
     modelo = BertModel.from_pretrained(nombre_modelo, cache_dir=PATH_MODELS)
     

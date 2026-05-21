@@ -12,3 +12,9 @@ PATH_DATA = Path(os.getenv("PATH_DATA", _PROJECT_ROOT / "data"))
 def ensure_dirs():
     PATH_MODELS.mkdir(parents=True, exist_ok=True)
     PATH_DATA.mkdir(parents=True, exist_ok=True)
+
+W2V_MODEL = "word2vec-google-news-300"
+BERT_MODEL = "bert-base-uncased"
+
+FINE_TUNING_MODEL = "distilbert-base-uncased"
+FINE_TUNING_PATH = PATH_MODELS / FINE_TUNING_MODEL
