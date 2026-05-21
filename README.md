@@ -67,4 +67,5 @@ uv sync --package clasificador
 uv sync --package agente
 ```
 
+---
 **Autor:** Javier Carreño Luque
