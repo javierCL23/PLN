@@ -1,4 +1,10 @@
-# ARCHIVO DEDICADO A LA CREACIÓN DE LOS PROMPTS NECESARIOS PARA QUE EL FLUJO SEA LO MÁS CONSISTENTE POSIBLE
+"""
+Módulo de configuración de prompts para el sistema multi-agente.
+
+Este archivo almacena las instrucciones base (system prompts) que definen 
+el comportamiento de los diferentes agentes encargados del análisis, 
+clasificación y recomendación de noticias.
+"""
 
 ORCHESTRATOR_PROMPT = """Eres el enrutador principal de un agente de análisis de noticias.
 Tu único objetivo es analizar la petición del usuario y delegarla a las herramientas correspondientes.
