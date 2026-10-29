@@ -1,5 +1,5 @@
 
-# Ejercicio 1: Clasificación Temática
+# Clasificación Temática
 
 En esta sección se explora la evolución de los sistemas de clasificación de texto, escalando en complejidad desde métodos estadísticos clásicos hasta modelos generativos modernos. El flujo de trabajo incluye:
 
