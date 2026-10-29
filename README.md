@@ -1,4 +1,4 @@
-# Clasificación y Recuperación de Información de Noticias (Práctica Final)
+# Clasificación y Recuperación de Información de Noticias
 
 Este repositorio contiene la implementación de la Práctica Final, enfocada en resolver dos tareas principales de Procesamiento de Lenguaje Natural (NLP) sobre un corpus de noticias.
 1. [**Clasificación temática de textos.**](./clasificador/)
