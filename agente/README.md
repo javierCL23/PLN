@@ -1,5 +1,5 @@
 
-# Ejercicio 2: Sistema RAG y agente de IA
+# Sistema RAG y agente de IA
 
 #### Sistema RAG
 
